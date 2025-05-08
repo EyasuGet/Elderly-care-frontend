@@ -3,6 +3,8 @@ package com.example.elderlycare2.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -12,7 +14,7 @@ import com.example.elderlycare2.presentation.screens.nurse.NurseHomeScreen
 
 // navigation/AppNav.kt
 @Composable
-fun AppNav(initialToken: String?) {
+fun AppNav(navController: NavHostController, initialToken: String?) {
     val navController = rememberNavController()
     LaunchedEffect(initialToken) {
         println("Initial token: $initialToken") // 👈 Check Logcat
@@ -22,7 +24,7 @@ fun AppNav(initialToken: String?) {
     }
     NavHost(navController, startDestination = if (initialToken != null) Routes.NURSE_HOME else Routes.LOGIN) {
         composable(Routes.LOGIN) {
-            LoginScreen(onLoginSuccess = { navController.navigate(Routes.NURSE_HOME) })
+            LoginScreen(onLoginSuccess = { navController.navigate(Routes.NURSE_HOME) },)
         }
         composable(Routes.NURSE_HOME) {
             NurseHomeScreen(token = initialToken!!)

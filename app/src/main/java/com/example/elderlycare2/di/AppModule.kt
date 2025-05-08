@@ -1,27 +1,32 @@
 package com.example.elderlycare2.di
 
-import com.example.elderlycare2.data.remote.api.NurseApi
+
+import android.content.Context
+import com.example.elderlycare2.data.remote.api.AuthApi
+import com.example.elderlycare2.data.repository.AuthRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    @Provides
-    fun provideRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000/") // Android emulator's localhost for backend
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+
+//    @Provides
+//    @Singleton
+//    fun provideActualSessionManager(@ApplicationContext context: Context): ActualSessionManager {
+//        return ActualSessionManager(context)
+//    }
 
     @Provides
-    fun provideNurseApi(retrofit: Retrofit): NurseApi {
-        return retrofit.create(NurseApi::class.java)
+    @Singleton
+    fun provideAuthRepository(authApi: AuthApi ): AuthRepository {
+        return AuthRepository(authApi)
     }
+
+
+
 }
-

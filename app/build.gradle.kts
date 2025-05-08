@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.medical_schedule_app"
+    namespace = "com.example.elderlycare2"  // Fixed typo: was "coom.example..."
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.medical_schedule_app"
+        applicationId = "com.example.elderlycare2"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

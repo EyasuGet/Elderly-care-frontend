@@ -1,5 +1,5 @@
 [versions]
-agp = "8.2.2"  # Android Gradle Plugin
+agp = "8.8.2"  # Android Gradle Plugin
 kotlin = "1.9.22"  # Kotlin version (2.0+ may have compatibility issues)
 coreKtx = "1.12.0"
 lifecycleRuntimeKtx = "2.6.2"
