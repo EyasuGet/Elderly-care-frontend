@@ -9,9 +9,9 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface TasksApi {
-    @GET("users/assigned")
-    suspend fun getAssignedUsers(): Response<List<User>>
+    @GET("users")
+    suspend fun getUsers(): Response<List<User>>
 
-    @POST("addTask")
+    @POST("nurse/addTask")
     suspend fun addTask(@Body request: TaskRequest): Response<TaskResponse>
 }

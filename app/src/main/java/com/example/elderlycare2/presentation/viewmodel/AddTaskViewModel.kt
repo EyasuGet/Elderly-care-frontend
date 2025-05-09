@@ -24,7 +24,7 @@ class AddTaskViewModel @Inject constructor(
     val uiState: StateFlow<AddTaskState> = _uiState.asStateFlow()
 
     init {
-        loadAssignedUsers()
+        loadUsers()
     }
 
     fun onEvent(event: AddTaskUiEvent) {
@@ -39,9 +39,9 @@ class AddTaskViewModel @Inject constructor(
         }
     }
 
-    private fun loadAssignedUsers() {
+    private fun loadUsers() {
         viewModelScope.launch {
-            taskRepository.getAssignedUsers().collect { result ->
+            taskRepository.getUsers().collect { result ->
                 when (result) {
                     is NetworkResult.Loading -> {
                         _uiState.update { it.copy(isLoading = true) }
@@ -49,7 +49,7 @@ class AddTaskViewModel @Inject constructor(
                     is NetworkResult.Success -> {
                         _uiState.update {
                             it.copy(
-                                assignedTo = result.data, // update the list of users
+                                assignedTo = result.data, // Update the list of all users
                                 isLoading = false,
                                 error = null
                             )
@@ -73,37 +73,55 @@ class AddTaskViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, isSuccess = false) }
 
-            val taskRequest = TaskRequest(
-                schedule = state.schedule,
-                frequency = state.frequency,
-                startTime = state.startTime,
-                endTime = state.endTime,
-                assignedTo = state.selectedUser?.let { listOf(it._id) } ?: emptyList()
-            )
+            if (state.selectedUser != null) {
+                // Send task to a specific user
+                val taskRequest = TaskRequest(
+                    schedule = state.schedule,
+                    frequency = state.frequency,
+                    startTime = state.startTime,
+                    endTime = state.endTime,
+                    assignedTo = listOf(state.selectedUser._id) // Send to the selected user's ID
+                )
+                sendTask(taskRequest)
+            } else {
+                // Send task to all users by iterating through the list
+                state.assignedTo.forEach { user ->
+                    val taskRequest = TaskRequest(
+                        schedule = state.schedule,
+                        frequency = state.frequency,
+                        startTime = state.startTime,
+                        endTime = state.endTime,
+                        assignedTo = listOf(user._id) // Send to each user's ID
+                    )
+                    sendTask(taskRequest)
+                }
+            }
+        }
+    }
 
-            taskRepository.addTask(taskRequest).collect { result ->
-                when (result) {
-                    is NetworkResult.Success -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                isSuccess = true,
-                                error = null
-                            )
-                        }
+    private suspend fun sendTask(taskRequest: TaskRequest) {
+        taskRepository.addTask(taskRequest).collect { result ->
+            when (result) {
+                is NetworkResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isSuccess = true,
+                            error = null
+                        )
                     }
-                    is NetworkResult.Error -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                isSuccess = false,
-                                error = result.message
-                            )
-                        }
+                }
+                is NetworkResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isSuccess = false,
+                            error = result.message
+                        )
                     }
-                    is NetworkResult.Loading -> {
-                        _uiState.update { it.copy(isLoading = true) }
-                    }
+                }
+                is NetworkResult.Loading -> {
+                    _uiState.update { it.copy(isLoading = true) }
                 }
             }
         }

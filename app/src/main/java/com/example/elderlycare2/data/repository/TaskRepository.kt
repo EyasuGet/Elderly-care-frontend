@@ -13,33 +13,33 @@ class TaskRepository @Inject constructor(
     private val tasksApi: TasksApi
 ) {
 
-    // Fetch the list of assigned users
-    fun getAssignedUsers(): Flow<NetworkResult<List<User>>> = flow {
+    // Fetch all users
+    suspend fun getUsers(): Flow<NetworkResult<List<User>>> = flow {
         emit(NetworkResult.Loading())
         try {
-            val response = tasksApi.getAssignedUsers()
+            val response = tasksApi.getUsers()
             if (response.isSuccessful && response.body() != null) {
                 emit(NetworkResult.Success(response.body()!!))
             } else {
-                emit(NetworkResult.Error("Failed to fetch assigned users: ${response.message()}"))
+                emit(NetworkResult.Error("Failed to fetch users: ${response.message()}"))
             }
         } catch (e: Exception) {
-            emit(NetworkResult.Error(e.message ?: "Network error"))
+            emit(NetworkResult.Error(e.message ?: "An unexpected error occurred"))
         }
     }
 
-    // Add a new task
-    fun addTask(request: TaskRequest): Flow<NetworkResult<TaskResponse>> = flow {
+    // Add a task
+    suspend fun addTask(taskRequest: TaskRequest): Flow<NetworkResult<TaskResponse>> = flow {
         emit(NetworkResult.Loading())
         try {
-            val response = tasksApi.addTask(request)
+            val response = tasksApi.addTask(taskRequest)
             if (response.isSuccessful && response.body() != null) {
                 emit(NetworkResult.Success(response.body()!!))
             } else {
                 emit(NetworkResult.Error("Failed to add task: ${response.message()}"))
             }
         } catch (e: Exception) {
-            emit(NetworkResult.Error(e.message ?: "Network error"))
+            emit(NetworkResult.Error(e.message ?: "An unexpected error occurred"))
         }
     }
 }
