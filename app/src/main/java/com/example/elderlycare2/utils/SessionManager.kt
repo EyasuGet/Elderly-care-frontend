@@ -2,27 +2,34 @@ package com.example.elderlycare2.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class SessionManager @Inject constructor(@ApplicationContext context: Context) {
+class SessionManager @Inject constructor(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
 
-    companion object {
-        private const val PREFS_NAME = "elderly_care_prefs"
-        private const val KEY_AUTH_TOKEN = "auth_token"
-    }
-
+    // Save auth token
     fun saveAuthToken(token: String) {
-        prefs.edit().putString(KEY_AUTH_TOKEN, token).apply()
+        preferences.edit().putString("auth_token", token).apply()
     }
 
-    fun fetchAuthToken(): String? {
-        return prefs.getString(KEY_AUTH_TOKEN, null)
+    // Retrieve auth token
+    fun getAuthToken(): String? {
+        return preferences.getString("auth_token", null)
     }
 
+    // Save user role
+    fun saveUserRole(role: String) {
+        preferences.edit().putString("user_role", role).apply()
+    }
+
+    // Retrieve user role
+    fun getUserRole(): String? {
+        return preferences.getString("user_role", null)
+    }
+
+    // Clear session
     fun clearSession() {
-        prefs.edit().clear().apply()
+        preferences.edit().clear().apply()
     }
 }
