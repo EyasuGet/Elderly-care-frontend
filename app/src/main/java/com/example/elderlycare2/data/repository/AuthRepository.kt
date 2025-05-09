@@ -12,6 +12,15 @@ class AuthRepository @Inject constructor(
     private val sessionManager: SessionManager
 ) {
 
+    fun getToken(): String? {
+        return sessionManager.getAuthToken()
+    }
+
+    // Retrieve the role from SessionManager
+    fun getRole(): String? {
+        return sessionManager.getUserRole()
+    }
+
     // Login method to authenticate the user
     suspend fun login(email: String, password: String): Result<String> {
         return try {
@@ -31,7 +40,7 @@ class AuthRepository @Inject constructor(
                 Role.USER -> apiService.signUpUser(signUpRequest) // Call user sign-up endpoint
                 Role.NURSE -> apiService.signUpNurse(signUpRequest) // Call nurse sign-up endpoint
             }
-            Result.success(Unit) // Return success result
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e) // Return failure result for exceptions
         }
