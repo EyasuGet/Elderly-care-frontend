@@ -1,7 +1,7 @@
-package com.example.elderlycare2.data.remote.api
+package com.example.elderlycare2.data.api
 
-import com.example.elderlycare2.data.remote.api.request.HealthUpdateRequest
-import com.example.elderlycare2.data.remote.api.request.TaskRequest
+import com.example.elderlycare2.data.remote.request.HealthUpdateRequest
+import com.example.elderlycare2.data.remote.request.TaskRequest
 import com.example.elderlycare2.data.remote.response.HealthMetricsResponse
 import com.example.elderlycare2.data.remote.response.TaskResponse
 import com.example.elderlycare2.data.remote.response.User

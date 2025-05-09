@@ -1,10 +1,12 @@
 package com.example.elderlycare2.data.remote.response
 
-import com.google.gson.annotations.SerializedName
-
-// TaskResponse.kt
 data class TaskResponse(
-    @SerializedName("_id") val id: String,
-    @SerializedName("schedule") val schedule: String,
-    @SerializedName("assignedTo") val assignedTo: List<String>
+    val id: String,
+    val schedule: String,
+    val startTime: String,
+    val endTime: String,
+    val frequency: String,
+    val done: Boolean,
+    val assignedTo: List<String>,
+    val version: Int
 )

@@ -1,9 +1,13 @@
 package com.example.elderlycare2.di
 
-
 import android.content.Context
-import com.example.elderlycare2.data.remote.api.AuthApi
+import com.example.elderlycare2.data.api.ApiService
+import com.example.elderlycare2.data.api.ScheduleApi
+import com.example.elderlycare2.data.api.TasksApi
 import com.example.elderlycare2.data.repository.AuthRepository
+import com.example.elderlycare2.data.repository.ScheduleRepository
+import com.example.elderlycare2.data.repository.TaskRepository
+import com.example.elderlycare2.utils.SessionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,18 +19,33 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    @Provides
+    @Singleton
+    fun provideSessionManager(@ApplicationContext context: Context): SessionManager {
+        return SessionManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(apiService: ApiService, sessionManager: SessionManager): AuthRepository {
+        return AuthRepository(apiService, sessionManager)
+    }
+
 //    @Provides
 //    @Singleton
-//    fun provideActualSessionManager(@ApplicationContext context: Context): ActualSessionManager {
-//        return ActualSessionManager(context)
+//    fun provideNurseRepository(apiService: ApiService): NurseRepository {
+//        return NurseRepository(apiService)
 //    }
 
     @Provides
     @Singleton
-    fun provideAuthRepository(authApi: AuthApi ): AuthRepository {
-        return AuthRepository(authApi)
+    fun provideScheduleRepository(scheduleApi: ScheduleApi): ScheduleRepository {
+        return ScheduleRepository(scheduleApi)
     }
 
-
-
+    @Provides
+    @Singleton
+    fun provideTaskRepository(tasksApi: TasksApi): TaskRepository {
+        return TaskRepository(tasksApi)
+    }
 }

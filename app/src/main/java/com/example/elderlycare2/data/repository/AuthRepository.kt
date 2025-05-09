@@ -1,47 +1,45 @@
 package com.example.elderlycare2.data.repository
 
-import com.example.elderlycare2.data.local.SessionManager
-import com.example.elderlycare2.data.remote.api.AuthApi
-import com.example.elderlycare2.data.remote.api.request.LoginRequest
-import com.example.elderlycare2.data.remote.api.request.SignUpRequest
-import com.example.elderlycare2.data.remote.response.AuthResponse
-import com.example.elderlycare2.utils.ApiResult
+import com.example.elderlycare2.data.api.ApiService
+import com.example.elderlycare2.data.remote.request.LoginRequest
+import com.example.elderlycare2.data.remote.request.SignUpRequest
+import com.example.elderlycare2.utils.SessionManager
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
-    private val api: AuthApi,
+    private val apiService: ApiService,
     private val sessionManager: SessionManager
 ) {
-    suspend fun loginUser(email: String, password: String): ApiResult<AuthResponse> {
+
+    suspend fun login(email: String, password: String): Result<String> {
         return try {
-            val response = api.loginUser(LoginRequest(email, password))
-            if (response.isSuccessful && response.body() != null) {
-                val authData = response.body()!!
-                sessionManager.saveToken(authData.token)
-                sessionManager.saveRole(authData.role)
-                ApiResult.Success(authData)
-            } else {
-                ApiResult.Error("Login failed: ${response.message()}")
-            }
+            val response = apiService.login(LoginRequest(email, password))
+            sessionManager.saveAuthToken(response.token)
+            Result.success(response.token)
         } catch (e: Exception) {
-            ApiResult.Error(e.message ?: "Network error")
+            Result.failure(e)
         }
     }
 
-    suspend fun signUpUser(request: SignUpRequest): ApiResult<AuthResponse> {
+    suspend fun signUpUser(email: String, password: String, name: String): Result<Unit> {
         return try {
-            val response = api.signUpUser(request)
-            if (response.isSuccessful && response.body() != null) {
-                ApiResult.Success(response.body()!!)
-            } else {
-                ApiResult.Error("Signup failed: ${response.message()}")
-            }
+            apiService.signUpUser(SignUpRequest(email, password, name))
+            Result.success(Unit)
         } catch (e: Exception) {
-            ApiResult.Error(e.message ?: "Network error")
+            Result.failure(e)
         }
     }
 
-    fun getToken(): String? = sessionManager.getToken()
-    fun getRole(): String? = sessionManager.getRole()
-    fun clearSession() = sessionManager.clearSession()
+    suspend fun signUpNurse(email: String, password: String, name: String): Result<Unit> {
+        return try {
+            apiService.signUpNurse(SignUpRequest(email, password, name))
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun logout() {
+        sessionManager.clearSession()
+    }
 }
