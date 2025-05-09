@@ -1,6 +1,7 @@
 package com.example.elderlycare2.data.repository
 
 import com.example.elderlycare2.data.api.ApiService
+import com.example.elderlycare2.data.model.Role
 import com.example.elderlycare2.data.remote.request.LoginRequest
 import com.example.elderlycare2.data.remote.request.SignUpRequest
 import com.example.elderlycare2.utils.SessionManager
@@ -11,34 +12,32 @@ class AuthRepository @Inject constructor(
     private val sessionManager: SessionManager
 ) {
 
+    // Login method to authenticate the user
     suspend fun login(email: String, password: String): Result<String> {
         return try {
             val response = apiService.login(LoginRequest(email, password))
-            sessionManager.saveAuthToken(response.token)
+            sessionManager.saveAuthToken(response.token) // Save auth token in session
             Result.success(response.token)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(e) // Return failure result for exceptions
         }
     }
 
-    suspend fun signUpUser(email: String, password: String, name: String): Result<Unit> {
+    // Unified sign-up method that handles both USER and NURSE roles
+    suspend fun signUp(email: String, password: String, name: String, role: Role): Result<Unit> {
         return try {
-            apiService.signUpUser(SignUpRequest(email, password, name))
-            Result.success(Unit)
+            val signUpRequest = SignUpRequest(email, password, name, role)
+            when (role) {
+                Role.USER -> apiService.signUpUser(signUpRequest) // Call user sign-up endpoint
+                Role.NURSE -> apiService.signUpNurse(signUpRequest) // Call nurse sign-up endpoint
+            }
+            Result.success(Unit) // Return success result
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(e) // Return failure result for exceptions
         }
     }
 
-    suspend fun signUpNurse(email: String, password: String, name: String): Result<Unit> {
-        return try {
-            apiService.signUpNurse(SignUpRequest(email, password, name))
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
+    // Logout method to clear session data
     fun logout() {
         sessionManager.clearSession()
     }

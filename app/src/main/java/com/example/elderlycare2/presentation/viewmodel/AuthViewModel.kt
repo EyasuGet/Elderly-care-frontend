@@ -6,8 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.elderlycare2.data.api.ApiService
+import com.example.elderlycare2.data.model.Role
 import com.example.elderlycare2.data.remote.request.LoginRequest
 import com.example.elderlycare2.data.remote.request.SignUpRequest
+import com.example.elderlycare2.utils.NetworkResult
 import com.example.elderlycare2.utils.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -22,8 +24,8 @@ class AuthViewModel @Inject constructor(
     private val _loginResult = MutableLiveData<Result<String>?>()
     val loginResult: LiveData<Result<String>?> = _loginResult
 
-    private val _signupResult = MutableLiveData<Result<Unit>?>()
-    val signupResult: LiveData<Result<Unit>?> = _signupResult
+    private val _signupResult = MutableLiveData<NetworkResult<Unit>?>()
+    val signupResult: LiveData<NetworkResult<Unit>?> = _signupResult
 
     val isLoggedIn: Boolean
         get() = sessionManager.fetchAuthToken() != null
@@ -50,48 +52,34 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signUpUser(email: String, password: String, name: String) {
+    fun signUp(email: String, password: String, name: String, role: Role) {
         viewModelScope.launch {
-            val result = try {
-                val signupRequest = SignUpRequest(
-                    email = email,
-                    password = password,
-                    name = name
-                )
-                apiService.signUpUser(signupRequest)
-                Result.success(Unit) // No token is generated during signup
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-            result.onSuccess {
-                Log.d("AuthViewModel", "Signup success.")
-            }
-            result.onFailure {
-                Log.e("AuthViewModel", "Signup failed: ${it.message}")
-            }
-            _signupResult.postValue(result)
-        }
-    }
+            // Emit loading state
+            _signupResult.postValue(NetworkResult.Loading())
 
-    fun signUpNurse(email: String, password: String, name: String) {
-        viewModelScope.launch {
+            // Try to make the API call
             val result = try {
                 val signupRequest = SignUpRequest(
                     email = email,
                     password = password,
-                    name = name
+                    name = name,
+                    role = role
                 )
-                apiService.signUpNurse(signupRequest)
-                Result.success(Unit) // No token is generated during signup
+
+                // Call the appropriate endpoint based on the role
+                when (role) {
+                    Role.USER -> apiService.signUpUser(signupRequest)
+                    Role.NURSE -> apiService.signUpNurse(signupRequest)
+                }
+
+                // Emit success state
+                NetworkResult.Success(Unit)
             } catch (e: Exception) {
-                Result.failure(e)
+                // Emit error state
+                NetworkResult.Error<Unit>(e.message ?: "An unknown error occurred")
             }
-            result.onSuccess {
-                Log.d("AuthViewModel", "Signup success.")
-            }
-            result.onFailure {
-                Log.e("AuthViewModel", "Signup failed: ${it.message}")
-            }
+
+            // Post the result to LiveData
             _signupResult.postValue(result)
         }
     }
