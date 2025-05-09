@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.elderlycare2.presentation.screens.auth.SignUpScreen
+import com.example.elderlycare2.presentation.screens.auth.landingPage.LandingPage
+
 
 @Composable
 fun AppNav(initialToken: String?) {
@@ -13,13 +15,25 @@ fun AppNav(initialToken: String?) {
 
     NavHost(
         navController = navController,
-        startDestination = if (initialToken != null) "home" else "signup"
+        startDestination = if (initialToken != null) "home" else "landing"  // lowercase "landing" to match route
     ) {
+        composable("landing") {
+            LandingPage(
+                onGetStarted = {
+                    navController.navigate("signup")  // assuming "login" is a valid route
+                }
+            )
+        }
+
         composable("signup") {
             SignUpScreen(
                 authViewModel = hiltViewModel(),
-                onLoginClick = {}
+                onLoginClick = {
+                    navController.navigate("login")
+                }
             )
         }
+
+        // You should also define the "home" and "login" composables
     }
 }
