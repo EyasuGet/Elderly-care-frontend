@@ -8,6 +8,7 @@ composeBom = "2023.08.00"
 hiltVersion = "2.48"
 retrofitVersion = "2.9.0"
 okhttpVersion = "4.12.0"
+runtimeLivedata = "1.8.1"
 
 [libraries]
 # Core
@@ -36,6 +37,7 @@ androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navig
 
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.7.3" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
