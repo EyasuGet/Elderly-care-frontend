@@ -28,7 +28,7 @@ class AuthViewModel @Inject constructor(
     val signupResult: LiveData<NetworkResult<Unit>?> = _signupResult
 
     val isLoggedIn: Boolean
-        get() = sessionManager.fetchAuthToken() != null
+        get() = sessionManager.getAuthToken() != null
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
