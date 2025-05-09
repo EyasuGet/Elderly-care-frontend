@@ -2,7 +2,7 @@ package com.example.elderlycare2.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.elderlycare2.data.remote.api.request.SignUpRequest
+import com.example.elderlycare2.data.remote.request.SignUpRequest
 import com.example.elderlycare2.data.remote.response.AuthResponse
 import com.example.elderlycare2.data.repository.AuthRepository
 import com.example.elderlycare2.utils.ApiResult

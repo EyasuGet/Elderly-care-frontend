@@ -1,80 +1,80 @@
 package com.example.elderlycare2.data.repository
 
-import com.example.elderlycare2.data.remote.api.NurseApi
-import com.example.elderlycare2.data.remote.api.request.TaskRequest
+import com.example.elderlycare2.data.api.NurseApi
+import com.example.elderlycare2.data.remote.request.HealthUpdateRequest
+import com.example.elderlycare2.data.remote.request.TaskRequest
+import com.example.elderlycare2.data.remote.response.HealthMetricsResponse
 import com.example.elderlycare2.data.remote.response.TaskResponse
 import com.example.elderlycare2.data.remote.response.User
-import com.example.elderlycare2.data.remote.response.HealthMetricsResponse
-import com.example.elderlycare2.data.remote.api.request.HealthUpdateRequest
-import com.example.elderlycare2.utils.ApiResult
+import com.example.elderlycare2.utils.NetworkResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class NurseRepository @Inject constructor(
     private val api: NurseApi
 ) {
     // Get list of assigned elders
-    suspend fun getAssignedElders(token: String): ApiResult<List<User>> {
-        return try {
+    fun getAssignedElders(token: String): Flow<NetworkResult<List<User>>> = flow {
+        emit(NetworkResult.Loading())
+        try {
             val response = api.getAssignedUsers("Bearer $token")
             if (response.isSuccessful) {
-                ApiResult.Success(response.body() ?: emptyList())
+                emit(NetworkResult.Success(response.body() ?: emptyList()))
             } else {
-                ApiResult.Error("Failed to fetch elders: ${response.code()}")
+                emit(NetworkResult.Error("Failed to fetch elders: ${response.code()}"))
             }
         } catch (e: Exception) {
-            ApiResult.Error(e.message ?: "Network error")
+            emit(NetworkResult.Error(e.message ?: "Network error"))
         }
     }
 
     // Add a new task for elders
-    suspend fun addTask(
-        token: String,
-        task: TaskRequest
-    ): ApiResult<TaskResponse> {
-        return try {
+    fun addTask(token: String, task: TaskRequest): Flow<NetworkResult<TaskResponse>> = flow {
+        emit(NetworkResult.Loading())
+        try {
             val response = api.addTask("Bearer $token", task)
             if (response.isSuccessful) {
-                ApiResult.Success(response.body()!!)
+                emit(NetworkResult.Success(response.body()!!))
             } else {
-                ApiResult.Error("Failed to add task: ${response.code()}")
+                emit(NetworkResult.Error("Failed to add task: ${response.code()}"))
             }
         } catch (e: Exception) {
-            ApiResult.Error(e.message ?: "Network error")
+            emit(NetworkResult.Error(e.message ?: "Network error"))
         }
     }
 
     // Get elder's health metrics
-    suspend fun getHealthMetrics(
-        token: String,
-        userId: String
-    ): ApiResult<HealthMetricsResponse> {
-        return try {
+    fun getHealthMetrics(token: String, userId: String): Flow<NetworkResult<HealthMetricsResponse>> = flow {
+        emit(NetworkResult.Loading())
+        try {
             val response = api.getUserDetails("Bearer $token", userId)
             if (response.isSuccessful) {
-                ApiResult.Success(response.body()!!)
+                emit(NetworkResult.Success(response.body()!!))
             } else {
-                ApiResult.Error("Failed to fetch health data: ${response.code()}")
+                emit(NetworkResult.Error("Failed to fetch health data: ${response.code()}"))
             }
         } catch (e: Exception) {
-            ApiResult.Error(e.message ?: "Network error")
+            emit(NetworkResult.Error(e.message ?: "Network error"))
         }
     }
 
     // Update health metrics
-    suspend fun updateHealthMetrics(
+    fun updateHealthMetrics(
         token: String,
         userId: String,
         metrics: HealthUpdateRequest
-    ): ApiResult<HealthMetricsResponse> {
-        return try {
+    ): Flow<NetworkResult<HealthMetricsResponse>> = flow {
+        emit(NetworkResult.Loading())
+        try {
             val response = api.updateUserDetails("Bearer $token", userId, metrics)
             if (response.isSuccessful) {
-                ApiResult.Success(response.body()!!)
+                emit(NetworkResult.Success(response.body()!!))
             } else {
-                ApiResult.Error("Update failed: ${response.code()}")
+                emit(NetworkResult.Error("Update failed: ${response.code()}"))
             }
         } catch (e: Exception) {
-            ApiResult.Error(e.message ?: "Network error")
+            emit(NetworkResult.Error(e.message ?: "Network error"))
         }
     }
 }

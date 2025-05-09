@@ -5,8 +5,10 @@ package com.example.elderlycare2.di
 //import com.example.medical_schedule_app.data.api.ApiService
 //import com.example.medical_schedule_app.data.api.DoctorApiService
 //import com.example.medical_schedule_app.data.api.ReceptionistApiService
-import com.example.elderlycare2.data.remote.api.AuthApi
-import com.example.elderlycare2.data.remote.api.NurseApi
+import com.example.elderlycare2.data.api.ApiService
+import com.example.elderlycare2.data.api.NurseApi
+import com.example.elderlycare2.data.api.ScheduleApi
+import com.example.elderlycare2.data.api.TasksApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -56,14 +58,26 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthApi(retrofit: Retrofit): AuthApi {
-        return retrofit.create(AuthApi::class.java)
+    fun provideAuthApi(retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
     }
 
     @Provides
     @Singleton
     fun provideNurseApi(retrofit: Retrofit): NurseApi {
         return retrofit.create(NurseApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideScheduleApi(retrofit: Retrofit): ScheduleApi {
+        return retrofit.create(ScheduleApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTasksApi(retrofit: Retrofit): TasksApi {
+        return retrofit.create(TasksApi::class.java)
     }
 
 //    @Provides

@@ -1,4 +1,4 @@
-package com.example.elderlycare2.data.remote.api.request
+package com.example.elderlycare2.data.remote.request
 
 data class TaskRequest(
     val schedule: String, // "InPerson", "Remote"

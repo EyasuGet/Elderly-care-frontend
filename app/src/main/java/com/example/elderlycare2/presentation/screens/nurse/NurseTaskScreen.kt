@@ -11,7 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.elderlycare2.data.remote.api.request.TaskRequest
+import com.example.elderlycare2.data.remote.request.TaskRequest
 import com.example.elderlycare2.presentation.viewmodel.NurseViewModel
 import com.example.elderlycare2.utils.ApiResult
 
@@ -42,7 +42,8 @@ fun NurseTaskScreen(viewModel: NurseViewModel, token: String) {
                 startTime = "2025-03-06T08:00:00Z",
                 endTime = "2025-03-07T08:00:00Z",
                 assignedTo = listOf("user123") // Replace with dynamic user IDs
-            ))
+            )
+            )
         }) {
             ("Assign Task")
         }
