@@ -26,3 +26,7 @@ val ButtonTextColor = Color(0xFFFFFFFF)
 
 // Error Colors
 val ErrorColor = Color(0xFFD32F2F)
+
+val TextFieldBackground = Color(0xFFEFEFEF) // Replace with your desired color
+val BorderFocusedColor = Color(0xFF6200EE) // Replace with focused border color
+val BorderUnfocusedColor = Color(0xFFCCCCCC) // Replace with unfocused border color
