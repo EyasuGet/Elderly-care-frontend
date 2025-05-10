@@ -77,6 +77,8 @@ dependencies {
     // DI
     implementation(libs.hilt.android)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.monitor)
+    implementation(libs.androidx.junit.ktx)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
