@@ -1,3 +1,4 @@
+
 package com.example.elderlycare2.navigation
 
 import androidx.compose.runtime.Composable
@@ -5,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.elderlycare2.presentation.screens.auth.LoginScreen
 import com.example.elderlycare2.presentation.screens.auth.SignUpScreen
 
 @Composable
@@ -18,7 +20,13 @@ fun AppNav(initialToken: String?) {
         composable("signup") {
             SignUpScreen(
                 authViewModel = hiltViewModel(),
-                onLoginClick = {}
+                onLoginClick = { navController.navigate("login") } // Navigate to LoginScreen
+            )
+        }
+        composable("login") {
+            LoginScreen(
+                onLogin = { /* Handle login logic */ },
+                onSignUp = { navController.navigate("signup") } // Navigate back to SignUpScreen
             )
         }
     }
