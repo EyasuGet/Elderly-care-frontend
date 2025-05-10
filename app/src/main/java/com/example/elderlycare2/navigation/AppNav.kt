@@ -15,7 +15,7 @@ fun AppNav(initialToken: String?) {
 
     NavHost(
         navController = navController,
-        startDestination = if (initialToken != null) "landing" else "signup"
+        startDestination = if (initialToken != null) "home" else "landing"
     )
 
     {
