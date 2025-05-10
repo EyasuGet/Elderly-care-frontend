@@ -9,6 +9,7 @@ import com.example.elderlycare2.presentation.screens.auth.LandingPage
 import com.example.elderlycare2.presentation.screens.auth.LoginScreen
 import com.example.elderlycare2.presentation.screens.auth.SignUpScreen
 import com.example.elderlycare2.presentation.screens.user.UserHomeScreen
+import com.example.elderlycare2.presentation.screens.user.UserProfileScreen
 
 @Composable
 fun AppNav(initialToken: String?) {
@@ -38,6 +39,10 @@ fun AppNav(initialToken: String?) {
         }
         composable("user_home") {
             UserHomeScreen(navController = navController)
+        }
+
+        composable("user_profile"){
+            UserProfileScreen(navController = navController)
         }
 //        composable("nurse_home") {
 //            NurseHomeScreen(navController = navController)

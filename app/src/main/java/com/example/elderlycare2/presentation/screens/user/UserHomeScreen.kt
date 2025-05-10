@@ -188,7 +188,7 @@ fun ScheduleCard(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Start", fontSize = 10.sp, color = TextColor)
+                        Text("Start", fontSize = 10.sp, color = TextColor, fontWeight = FontWeight.Bold)
                         Text(startDate ?: "--", fontSize = 12.sp)
                     }
 
@@ -203,7 +203,7 @@ fun ScheduleCard(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("End", fontSize = 10.sp, color = TextColor)
+                        Text("End", fontSize = 10.sp, color = TextColor, fontWeight = FontWeight.Bold)
                         Text(endDate ?: "--", fontSize = 12.sp)
                     }
                 }

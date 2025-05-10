@@ -1,7 +1,5 @@
 package com.example.elderlycare2.ui.components
 
-
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.height
@@ -33,14 +31,14 @@ fun BottomNavBar(navController: NavHostController, showUpload : Boolean = true) 
 
             icon = {
                 Image(
-                    painter = painterResource(id = R.drawable.logo), // Replace with your doc image
+                    painter = painterResource(id = R.drawable.file),
                     contentDescription = "Documents",
                     modifier = Modifier.size(35.dp)
                 )
             },
             selected = selectedItem == 0,
             onClick = { selectedItem = 1
-                navController.navigate("user/home")},
+                navController.navigate("user_home")},
 
             )
 
@@ -48,7 +46,7 @@ fun BottomNavBar(navController: NavHostController, showUpload : Boolean = true) 
             icon = {
                 if(showUpload){
                     Image(
-                        painter = painterResource(id = R.drawable.logo), // Replace with your upload image
+                        painter = painterResource(id = R.drawable.upload),
                         contentDescription = "Upload",
                         modifier = Modifier.size(35.dp)
                     )
@@ -62,20 +60,17 @@ fun BottomNavBar(navController: NavHostController, showUpload : Boolean = true) 
 
             )
 
-
-
         NavigationBarItem(
             icon = {
                 Image(
-                    painter = painterResource(id = R.drawable.logo), // Replace with your profile image
+                    painter = painterResource(id = R.drawable.profile),
                     contentDescription = "Profile",
                     modifier = Modifier.size(35.dp)
                 )
             },
             selected = selectedItem == 0,
             onClick = { selectedItem =0
-                navController.navigate("user/profile")},
-
+                navController.navigate("user_profile")},
             )
     }
 }
