@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -20,10 +21,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,18 +33,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.elderlycare2.data.model.Role
-import com.example.elderlycare2.presentation.viewmodel.AuthViewModel
-import com.example.elderlycare2.utils.NetworkResult
+import com.example.elderlycare2.presentation.state.SignupEvent
+import com.example.elderlycare2.presentation.viewmodel.SignupViewModel
 
 @Composable
-fun SignUpScreen(authViewModel: AuthViewModel = viewModel(), onLoginClick: () -> Unit) {
-    val signupResult by authViewModel.signupResult.observeAsState()
-    val fullName = remember { mutableStateOf("") }
-    val email = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
-    val confirmPassword = remember { mutableStateOf("") }
-    val role = remember { mutableStateOf(Role.USER) } // Default role is USER
+fun SignUpScreen(signupViewModel: SignupViewModel = viewModel(), onLoginClick: () -> Unit) {
+    val signupState by signupViewModel.signupState.collectAsState()
 
     val backgroundColor = Color(0xFFCAE7E5)
     val primaryColor = Color(0xFF1C6B66)
@@ -70,50 +63,58 @@ fun SignUpScreen(authViewModel: AuthViewModel = viewModel(), onLoginClick: () ->
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Role Selector
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            RoleToggleButton("User", role.value == Role.USER) { role.value = Role.USER }
-            RoleToggleButton("Nurse", role.value == Role.NURSE) { role.value = Role.NURSE }
-        }
+        // Role Selector (NEW LOGIC)
+        RoleSelection(signupViewModel = signupViewModel)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Input Fields
         TextFieldLabel("Full Name*")
-        SignUpTextField("Enter your name", fullName.value) { fullName.value = it }
+        SignUpTextField(
+            label = "Enter Your Name",
+            value = signupState.name,
+            onValueChange = { signupViewModel.handleEvent(SignupEvent.OnNameChange(it)) }
+        )
 
         TextFieldLabel("Email*")
-        SignUpTextField("Enter your email", email.value) { email.value = it }
+        SignUpTextField(
+            label = "Enter Your Email",
+            value = signupState.email,
+            onValueChange = { signupViewModel.handleEvent(SignupEvent.OnEmailChange(it)) }
+        )
 
         TextFieldLabel("Password*")
-        SignUpTextField("Enter your password", password.value, isPassword = true) {
-            password.value = it
-        }
+        SignUpTextField(
+            label = "Enter your password",
+            value = signupState.password,
+            isPassword = true,
+            onValueChange = { signupViewModel.handleEvent(SignupEvent.OnPassword(it)) }
+        )
 
         TextFieldLabel("Confirm Password*")
-        SignUpTextField("Re-enter your password", confirmPassword.value, isPassword = true) {
-            confirmPassword.value = it
-        }
+        SignUpTextField(
+            label = "ReEnter Your password",
+            value = signupState.confirmPassword,
+            isPassword = true,
+            onValueChange = { signupViewModel.handleEvent(SignupEvent.OnConfirmPassword(it)) }
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // Submit Button
         Button(
             onClick = {
-                if (password.value == confirmPassword.value) {
-                    // Call the shared signUp method in AuthViewModel
-                    authViewModel.signUp(
-                        email = email.value,
-                        password = password.value,
-                        name = fullName.value,
-                        role = role.value
+                if (signupState.password == signupState.confirmPassword) {
+                    // Trigger signup based on role
+                    signupViewModel.handleEvent(
+                        when (signupState.role) {
+                            "USER" -> SignupEvent.SignUpUser(signupState.email, signupState.password, signupState.name)
+                            "NURSE" -> SignupEvent.SignUpNurse(signupState.email, signupState.password, signupState.name)
+                            else -> throw Error("Role error")
+                        }
                     )
                 } else {
-                    // Handle password mismatch
-                    authViewModel.clearAuthResults()
+                    signupViewModel.handleEvent(SignupEvent.ClearSignupResults)
                 }
             },
             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
@@ -122,7 +123,11 @@ fun SignUpScreen(authViewModel: AuthViewModel = viewModel(), onLoginClick: () ->
                 .height(56.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Create Account", color = white, fontWeight = FontWeight.Bold)
+            if (signupState.isLoading) {
+                CircularProgressIndicator(color = white, modifier = Modifier.size(24.dp))
+            } else {
+                Text("Create Account", color = white, fontWeight = FontWeight.Bold)
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -141,27 +146,25 @@ fun SignUpScreen(authViewModel: AuthViewModel = viewModel(), onLoginClick: () ->
         Spacer(modifier = Modifier.height(16.dp))
 
         // Handle Results
-        when (signupResult) {
-            is NetworkResult.Success -> {
+        when {
+            signupState.isSignedUp -> {
                 Text(
                     text = "Sign up successful!",
                     color = Color.Green,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
+                signupViewModel.handleEvent(SignupEvent.ClearSignupResults)
             }
-            is NetworkResult.Error -> {
+            signupState.error != null -> {
                 Text(
-                    text = (signupResult as NetworkResult.Error).message,
+                    text = signupState.error!!,
                     color = Color.Red,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
+                signupViewModel.handleEvent(SignupEvent.ClearSignupResults)
             }
-            is NetworkResult.Loading -> {
-                CircularProgressIndicator(color = Color.Blue)
-            }
-            null -> { /* Do nothing */ }
         }
     }
 }
@@ -221,4 +224,28 @@ fun SignUpTextField(
             unfocusedContainerColor = Color.White
         )
     )
+}
+
+@Composable
+fun RoleSelection(signupViewModel: SignupViewModel) {
+    val signupState by signupViewModel.signupState.collectAsState()
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        RoleToggleButton(
+            text = "User",
+            selected = signupState.role == "USER"
+        ) {
+            signupViewModel.handleEvent(SignupEvent.OnRoleChange("USER"))
+        }
+
+        RoleToggleButton(
+            text = "Nurse",
+            selected = signupState.role == "NURSE"
+        ) {
+            signupViewModel.handleEvent(SignupEvent.OnRoleChange("NURSE"))
+        }
+    }
 }

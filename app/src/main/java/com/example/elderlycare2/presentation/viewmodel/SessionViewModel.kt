@@ -3,16 +3,13 @@ package com.example.elderlycare2.presentation.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.elderlycare2.data.repository.AuthRepository
+import com.example.elderlycare2.data.storage.LocalStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SessionViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val localStorage: LocalStorage
 ) : ViewModel() {
 
     private val _token = MutableLiveData<String?>()
@@ -23,9 +20,13 @@ class SessionViewModel @Inject constructor(
 
     init {
         // Load token and role when the ViewModel is initialized
-        viewModelScope.launch(Dispatchers.IO) {
-            _token.postValue(authRepository.getToken())
-            _role.postValue(authRepository.getRole())
-        }
+        _token.value = localStorage.getToken()
+        _role.value = localStorage.getRole()
+    }
+
+    fun clearSession() {
+        localStorage.clearSession()
+        _token.value = null
+        _role.value = null
     }
 }

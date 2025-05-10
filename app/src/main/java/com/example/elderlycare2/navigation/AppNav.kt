@@ -29,7 +29,7 @@ fun AppNav(initialToken: String?) {
 
         composable("signup") {
             SignUpScreen(
-                authViewModel = hiltViewModel(),
+                signupViewModel = hiltViewModel(),
                 onLoginClick = { navController.navigate("login") } // Navigate to LoginScreen
             )
         }

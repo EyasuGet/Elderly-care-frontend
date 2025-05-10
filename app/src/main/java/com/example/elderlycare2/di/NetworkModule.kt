@@ -8,8 +8,11 @@ package com.example.elderlycare2.di
 import com.example.elderlycare2.data.api.ApiService
 import com.example.elderlycare2.data.api.NurseApi
 import com.example.elderlycare2.data.api.ScheduleApi
+import com.example.elderlycare2.data.api.SignupApi
 import com.example.elderlycare2.data.api.TasksApi
 import com.example.elderlycare2.data.api.UserProfileApi
+import com.example.elderlycare2.data.network.AuthInterceptor
+import com.example.elderlycare2.data.storage.LocalStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,9 +41,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+    fun provideOkHttpClient(
+        localStorage: LocalStorage,
+        loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
+            .addInterceptor(AuthInterceptor(localStorage)) // Add authentication
+            .addInterceptor(loggingInterceptor)           // Add logging
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -56,6 +63,14 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
+
+//    @Provides
+//    @Singleton
+//    fun provideOkHttpClient(localStorage: LocalStorage): OkHttpClient {
+//        return OkHttpClient.Builder()
+//            .addInterceptor(AuthInterceptor(localStorage))
+//            .build()
+//    }
 
     @Provides
     @Singleton
@@ -85,6 +100,12 @@ object NetworkModule {
     @Singleton
     fun provideUserProfileApi(retrofit: Retrofit): UserProfileApi {
         return retrofit.create(UserProfileApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSignupApi(retrofit: Retrofit): SignupApi {
+        return retrofit.create(SignupApi::class.java)
     }
 
 //    @Provides

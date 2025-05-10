@@ -1,14 +1,15 @@
 package com.example.elderlycare2.di
 
 import android.content.Context
-import com.example.elderlycare2.data.api.ApiService
 import com.example.elderlycare2.data.api.ScheduleApi
+import com.example.elderlycare2.data.api.SignupApi
 import com.example.elderlycare2.data.api.TasksApi
 import com.example.elderlycare2.data.api.UserProfileApi
-import com.example.elderlycare2.data.repository.AuthRepository
 import com.example.elderlycare2.data.repository.ScheduleRepository
+import com.example.elderlycare2.data.repository.SignupRepository
 import com.example.elderlycare2.data.repository.TaskRepository
 import com.example.elderlycare2.data.repository.UserProfileRepository
+import com.example.elderlycare2.data.storage.LocalStorage
 import com.example.elderlycare2.utils.SessionManager
 import dagger.Module
 import dagger.Provides
@@ -27,11 +28,11 @@ object AppModule {
         return SessionManager(context)
     }
 
-    @Provides
-    @Singleton
-    fun provideAuthRepository(apiService: ApiService, sessionManager: SessionManager): AuthRepository {
-        return AuthRepository(apiService, sessionManager)
-    }
+//    @Provides
+//    @Singleton
+//    fun provideAuthRepository(apiService: ApiService, sessionManager: SessionManager): AuthRepository {
+//        return AuthRepository(apiService, sessionManager)
+//    }
 
 //    @Provides
 //    @Singleton
@@ -55,5 +56,17 @@ object AppModule {
     @Singleton
     fun provideUserProfileRepository(userProfileApi: UserProfileApi): UserProfileRepository {
         return UserProfileRepository(userProfileApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSignupRepository(signupApi: SignupApi): SignupRepository {
+        return SignupRepository(signupApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalStorage(@ApplicationContext context: Context): LocalStorage {
+        return LocalStorage(context)
     }
 }
