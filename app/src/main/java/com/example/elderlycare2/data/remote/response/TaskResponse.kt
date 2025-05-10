@@ -8,5 +8,4 @@ data class TaskResponse(
     val frequency: String,
     val done: Boolean,
     val assignedTo: List<String>,
-    val version: Int
 )

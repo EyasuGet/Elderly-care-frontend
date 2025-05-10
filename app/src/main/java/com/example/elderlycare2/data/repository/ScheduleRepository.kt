@@ -10,12 +10,15 @@ import javax.inject.Inject
 class ScheduleRepository @Inject constructor(
     private val scheduleApi: ScheduleApi
 ) {
-
     fun getTasks(): Flow<NetworkResult<List<TaskResponse>>> = flow {
         emit(NetworkResult.Loading())
         try {
             val response = scheduleApi.getTasks()
-            emit(NetworkResult.Success(response.body()!!))
+            if (response.isSuccessful && response.body() != null) {
+                emit(NetworkResult.Success(response.body()!!.tasks))
+            } else {
+                emit(NetworkResult.Error("Failed to fetch tasks"))
+            }
         } catch (e: Exception) {
             emit(NetworkResult.Error(e.message ?: "Network error"))
         }

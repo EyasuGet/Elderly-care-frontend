@@ -12,38 +12,46 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.elderlycare2.presentation.viewmodel.TimeScheduleViewModel
 import com.example.elderlycare2.ui.components.BottomNavBar
 import com.example.elderlycare2.ui.theme.BackgroundColor
 import com.example.elderlycare2.ui.theme.BackgroundColoruser
 import com.example.elderlycare2.ui.theme.TextColor
 
+private fun extractDateOnly(isoString: String?): String {
+    // Returns only the date part, e.g. "2025-03-05" from "2025-03-05T21:00:00.000Z"
+    return isoString?.takeIf { it.contains("T") }?.substringBefore("T")
+        ?: isoString?.take(10)
+        ?: "--"
+}
+
 @Composable
-fun UserHomeScreen(navController: NavHostController,
-                   dotColor: Color = Color.Green,
-                   title: String = "Default Title",
-                   subText: String = "Default Subtext",
-                   startDate: String? = null,
-                   endDate: String = "Default End Time"
+fun UserHomeScreen(
+    navController: NavHostController,
+    viewModel: TimeScheduleViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsState()
+
     Scaffold(
         bottomBar = {
             BottomNavBar(navController = navController, showUpload = false)
@@ -52,7 +60,7 @@ fun UserHomeScreen(navController: NavHostController,
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundColoruser) // Use BackgroundColor from colors.kt
+                .background(BackgroundColoruser)
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(24.dp))
@@ -63,29 +71,48 @@ fun UserHomeScreen(navController: NavHostController,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            ScheduleCard(
-                dotColor = Color(0xFFFFA500), // Orange
-                title = "Medication",
-                subText = "In\n≃ 30min",
-                startDate = "Tue, April 10",
-                endDate = "Tue, April 24"
-            )
-
-            ScheduleCard(
-                dotColor = Color(0xFF00C853), // Green
-                title = "Doctor's Appointment",
-                subText = "Wed, April 8",
-                startDate = "Wed, April 8",
-                endDate = "5:00PM"
-            )
-
-            ScheduleCard(
-                dotColor = Color(0xFF00C853), // Green
-                title = "Exercise",
-                subText = "Daily",
-                startDate = "Tue, April 10",
-                endDate = "Tue, April 24"
-            )
+            when {
+                state.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                !state.error.isNullOrEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Error: ${state.error}")
+                    }
+                }
+                state.tasks.isNullOrEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No tasks available")
+                    }
+                }
+                else -> {
+                    state.tasks!!.forEach { task ->
+                        ScheduleCard(
+                            dotColor = when (task.schedule.lowercase()) {
+                                "medication" -> Color(0xFFFFA500)
+                                "doctor's appointment" -> Color(0xFF00C853)
+                                "exercise" -> Color(0xFF00C853)
+                                else -> Color.Gray
+                            },
+                            title = task.schedule,
+                            subText = task.frequency ?: "--",
+                            startDate = extractDateOnly(task.startTime),
+                            endDate = extractDateOnly(task.endTime)
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -96,14 +123,14 @@ fun ScheduleCard(
     title: String,
     subText: String,
     startDate: String? = null,
-    endDate: String
+    endDate: String? = null
 ) {
-    val cardColor = BackgroundColor // Use BackgroundColor from colors.kt
+    val cardColor = BackgroundColor
     Row {
         Box(
             modifier = Modifier
                 .size(20.dp)
-                .background(dotColor, shape = CircleShape)
+                .background(dotColor, shape = androidx.compose.foundation.shape.CircleShape)
                 .align(Alignment.CenterVertically)
         )
         Spacer(modifier = Modifier.size(16.dp))
@@ -111,7 +138,7 @@ fun ScheduleCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-            shape = RoundedCornerShape(16.dp),
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = cardColor)
         ) {
             Column(
@@ -135,14 +162,14 @@ fun ScheduleCard(
                         verticalAlignment = Alignment.Top
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Close,
+                            imageVector = androidx.compose.material.icons.Icons.Default.Close,
                             contentDescription = "Delete",
                             tint = Color.Red,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(
-                            imageVector = Icons.Default.Check,
+                            imageVector = androidx.compose.material.icons.Icons.Default.Check,
                             contentDescription = "Done",
                             tint = Color.Green,
                             modifier = Modifier.size(20.dp)
@@ -161,7 +188,7 @@ fun ScheduleCard(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Start", fontSize = 10.sp, color = TextColor) // TextColor from colors.kt
+                        Text("Start", fontSize = 10.sp, color = TextColor)
                         Text(startDate ?: "--", fontSize = 12.sp)
                     }
 
@@ -176,8 +203,8 @@ fun ScheduleCard(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("End", fontSize = 10.sp, color = TextColor) // TextColor from colors.kt
-                        Text(endDate, fontSize = 12.sp)
+                        Text("End", fontSize = 10.sp, color = TextColor)
+                        Text(endDate ?: "--", fontSize = 12.sp)
                     }
                 }
             }
