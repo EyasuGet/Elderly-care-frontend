@@ -4,9 +4,11 @@ import android.content.Context
 import com.example.elderlycare2.data.api.ApiService
 import com.example.elderlycare2.data.api.ScheduleApi
 import com.example.elderlycare2.data.api.TasksApi
+import com.example.elderlycare2.data.api.UserProfileApi
 import com.example.elderlycare2.data.repository.AuthRepository
 import com.example.elderlycare2.data.repository.ScheduleRepository
 import com.example.elderlycare2.data.repository.TaskRepository
+import com.example.elderlycare2.data.repository.UserProfileRepository
 import com.example.elderlycare2.utils.SessionManager
 import dagger.Module
 import dagger.Provides
@@ -47,5 +49,11 @@ object AppModule {
     @Singleton
     fun provideTaskRepository(tasksApi: TasksApi): TaskRepository {
         return TaskRepository(tasksApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserProfileRepository(userProfileApi: UserProfileApi): UserProfileRepository {
+        return UserProfileRepository(userProfileApi)
     }
 }

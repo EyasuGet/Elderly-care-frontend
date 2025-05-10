@@ -9,6 +9,7 @@ import com.example.elderlycare2.data.api.ApiService
 import com.example.elderlycare2.data.api.NurseApi
 import com.example.elderlycare2.data.api.ScheduleApi
 import com.example.elderlycare2.data.api.TasksApi
+import com.example.elderlycare2.data.api.UserProfileApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,7 +26,7 @@ import javax.inject.Singleton
 object NetworkModule {
 
     // Base URL for the API
-    private const val BASE_URL = "http://10.0.2.2:4000/api/v1/"
+    private const val BASE_URL = "http://10.6.208.38:8000/api/v1/"
 
     @Provides
     @Singleton
@@ -78,6 +79,12 @@ object NetworkModule {
     @Singleton
     fun provideTasksApi(retrofit: Retrofit): TasksApi {
         return retrofit.create(TasksApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserProfileApi(retrofit: Retrofit): UserProfileApi {
+        return retrofit.create(UserProfileApi::class.java)
     }
 
 //    @Provides

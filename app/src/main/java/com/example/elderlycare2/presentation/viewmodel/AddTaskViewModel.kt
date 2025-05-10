@@ -100,28 +100,32 @@ class AddTaskViewModel @Inject constructor(
     }
 
     private suspend fun sendTask(taskRequest: TaskRequest) {
-        taskRepository.addTask(taskRequest).collect { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            isSuccess = true,
-                            error = null
-                        )
+        viewModelScope.launch {
+            taskRepository.addTask(taskRequest).collect { result ->
+                when (result) {
+                    is NetworkResult.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                isSuccess = true,
+                                error = null
+                            )
+                        }
                     }
-                }
-                is NetworkResult.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            isSuccess = false,
-                            error = result.message
-                        )
+
+                    is NetworkResult.Error -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                isSuccess = false,
+                                error = result.message
+                            )
+                        }
                     }
-                }
-                is NetworkResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
+
+                    is NetworkResult.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
                 }
             }
         }

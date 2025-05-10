@@ -6,8 +6,8 @@ plugins {
 }
 
 android {
-    namespace = "com.example.elderlycare2"  // Fixed typo: was "coom.example..."
-    compileSdk = 34
+    namespace = "com.example.elderlycare2"
+    compileSdk = 35// Fixed typo: was "coom.example..."
 
     defaultConfig {
         applicationId = "com.example.elderlycare2"
@@ -76,6 +76,7 @@ dependencies {
 
     // DI
     implementation(libs.hilt.android)
+    implementation(libs.androidx.runtime.livedata)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
