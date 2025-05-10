@@ -60,13 +60,18 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
 
     // Listen for login result and navigate based on role
-    LaunchedEffect(loginState.isSuccess, loginState.role) {
+    LaunchedEffect(loginState.isSuccess) {
         if (loginState.isSuccess) {
             when (loginState.role) {
-                "admin" -> navController.navigate("admin_home") { popUpTo("login") { inclusive = true } }
-                "nurse" -> navController.navigate("nurse_home") { popUpTo("login") { inclusive = true } }
-                "user"  -> navController.navigate("user_home") { popUpTo("login") { inclusive = true } }
-                else    -> {/* Optionally show error or default */}
+                "nurse" -> navController.navigate("nurse_home") {
+                    popUpTo("landing") { inclusive = true }
+                }
+                "user" -> navController.navigate("user_home") {
+                    popUpTo("landing") { inclusive = true }
+                }
+                else -> {
+                    // Optionally show an error or fallback
+                }
             }
         }
     }

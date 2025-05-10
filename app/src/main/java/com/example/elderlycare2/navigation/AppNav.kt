@@ -5,22 +5,23 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.elderlycare2.presentation.screens.auth.LandingPage
 import com.example.elderlycare2.presentation.screens.auth.LoginScreen
 import com.example.elderlycare2.presentation.screens.auth.SignUpScreen
-import com.example.elderlycare2.presentation.screens.auth.LandingPage
+import com.example.elderlycare2.presentation.screens.user.UserHomeScreen
+
 @Composable
 fun AppNav(initialToken: String?) {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = if (initialToken != null) "home" else "landing"
+        startDestination = "landing"
     ) {
         composable("landing") {
             LandingPage(
-                onGetStarted = {
-                    navController.navigate("signup")
-                }
+                onGetStarted = { navController.navigate("signup") },
+                onLogin = { navController.navigate("login") }
             )
         }
         composable("signup") {
@@ -35,9 +36,11 @@ fun AppNav(initialToken: String?) {
                 onSignUp = { navController.navigate("signup") }
             )
         }
-        // Add your home/admin/nurse/user screens here as needed:
-        // composable("home") { HomeScreen() }
-//         composable("nurse_home") { NurseHomeScreen() }
-
+        composable("user_home") {
+            UserHomeScreen(navController = navController)
+        }
+//        composable("nurse_home") {
+//            NurseHomeScreen(navController = navController)
+//        }
     }
 }

@@ -34,7 +34,10 @@ val BackgroundBoxColor = Color(0xFFCAE7E5)
 val TextColor = PrimaryColor
 
 @Composable
-fun LandingPage(onGetStarted: () -> Unit) {
+fun LandingPage(
+    onGetStarted: () -> Unit,
+    onLogin: () -> Unit
+) {
     Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
