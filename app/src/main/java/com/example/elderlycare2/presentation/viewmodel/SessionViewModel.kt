@@ -11,15 +11,12 @@ import javax.inject.Inject
 class SessionViewModel @Inject constructor(
     private val localStorage: LocalStorage
 ) : ViewModel() {
-
     private val _token = MutableLiveData<String?>()
     val token: LiveData<String?> = _token
-
     private val _role = MutableLiveData<String?>()
     val role: LiveData<String?> = _role
 
     init {
-        // Load token and role when the ViewModel is initialized
         _token.value = localStorage.getToken()
         _role.value = localStorage.getRole()
     }

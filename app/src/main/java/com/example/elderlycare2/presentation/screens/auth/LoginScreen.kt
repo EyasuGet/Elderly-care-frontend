@@ -15,10 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +35,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.elderlycare2.R
+import com.example.elderlycare2.presentation.state.LoginEvent
+import com.example.elderlycare2.presentation.viewmodel.LoginViewModel
 import com.example.elderlycare2.ui.theme.BackgroundColor
 import com.example.elderlycare2.ui.theme.BorderFocusedColor
 import com.example.elderlycare2.ui.theme.BorderUnfocusedColor
@@ -42,12 +50,26 @@ import com.example.elderlycare2.ui.theme.TextFieldBackground
 
 @Composable
 fun LoginScreen(
-    onLogin: () -> Unit = {},
+    navController: NavController,
+    loginViewModel: LoginViewModel = hiltViewModel(),
     onForgotPassword: () -> Unit = {},
     onSignUp: () -> Unit = {}
 ) {
+    val loginState by loginViewModel.loginState.collectAsState()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    // Listen for login result and navigate based on role
+    LaunchedEffect(loginState.isSuccess, loginState.role) {
+        if (loginState.isSuccess) {
+            when (loginState.role) {
+                "admin" -> navController.navigate("admin_home") { popUpTo("login") { inclusive = true } }
+                "nurse" -> navController.navigate("nurse_home") { popUpTo("login") { inclusive = true } }
+                "user"  -> navController.navigate("user_home") { popUpTo("login") { inclusive = true } }
+                else    -> {/* Optionally show error or default */}
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -84,8 +106,14 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(28.dp))
 
-        LoginTextField("Email", "Enter your email", email) { email = it }
-        LoginTextField("Password", "Enter your Password", password, isPassword = true) { password = it }
+        LoginTextField("Email", "Enter your email", email) {
+            email = it
+            loginViewModel.handleEvent(LoginEvent.OnEmailChange(it))
+        }
+        LoginTextField("Password", "Enter your Password", password, isPassword = true) {
+            password = it
+            loginViewModel.handleEvent(LoginEvent.OnPasswordChange(it))
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -97,14 +125,16 @@ fun LoginScreen(
                 text = "Forgot Password?",
                 color = PrimaryColor,
                 fontSize = 14.sp,
-                modifier = Modifier.clickable { onForgotPassword() } // Callback for Forgot Password
+                modifier = Modifier.clickable { onForgotPassword() }
             )
         }
 
         Spacer(modifier = Modifier.height(40.dp))
 
         Button(
-            onClick = onLogin, // Callback for Login
+            onClick = {
+                loginViewModel.handleEvent(LoginEvent.Login(email, password))
+            },
             shape = RoundedCornerShape(25.dp),
             colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
             modifier = Modifier
@@ -122,7 +152,21 @@ fun LoginScreen(
                 "Sign up",
                 color = PrimaryColor,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.clickable { onSignUp() } // Callback for Sign Up
+                modifier = Modifier.clickable { onSignUp() }
+            )
+        }
+
+        // Show loading or error
+        if (loginState.isLoading) {
+            Spacer(modifier = Modifier.height(20.dp))
+            CircularProgressIndicator(color = PrimaryColor)
+        }
+        if (loginState.error != null) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = loginState.error ?: "",
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp)
             )
         }
     }
@@ -139,7 +183,11 @@ fun LoginTextField(
     val visualTransformation =
         if (isPassword) PasswordVisualTransformation() else VisualTransformation.None
 
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp)
+    ) {
         Text(
             text = label,
             color = TextColor,

@@ -7,8 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.elderlycare2.presentation.screens.auth.LoginScreen
 import com.example.elderlycare2.presentation.screens.auth.SignUpScreen
-import com.example.elderlycare2.presentation.screens.auth.landingPage.LandingPage
-
+import com.example.elderlycare2.presentation.screens.auth.LandingPage
 @Composable
 fun AppNav(initialToken: String?) {
     val navController = rememberNavController()
@@ -16,28 +15,29 @@ fun AppNav(initialToken: String?) {
     NavHost(
         navController = navController,
         startDestination = if (initialToken != null) "home" else "landing"
-    )
-
-    {
-            composable("landing") {
-                LandingPage(
-                    onGetStarted = {
-                        navController.navigate("signup")  // assuming "login" is a valid route
-                    }
-                )
-            }
-
+    ) {
+        composable("landing") {
+            LandingPage(
+                onGetStarted = {
+                    navController.navigate("signup")
+                }
+            )
+        }
         composable("signup") {
             SignUpScreen(
                 signupViewModel = hiltViewModel(),
-                onLoginClick = { navController.navigate("login") } // Navigate to LoginScreen
+                onLoginClick = { navController.navigate("login") }
             )
         }
         composable("login") {
             LoginScreen(
-                onLogin = { /* Handle login logic */ },
-                onSignUp = { navController.navigate("signup") } // Navigate back to SignUpScreen
+                navController = navController,
+                onSignUp = { navController.navigate("signup") }
             )
         }
+        // Add your home/admin/nurse/user screens here as needed:
+        // composable("home") { HomeScreen() }
+//         composable("nurse_home") { NurseHomeScreen() }
+
     }
 }

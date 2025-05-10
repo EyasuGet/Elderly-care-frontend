@@ -1,10 +1,12 @@
 package com.example.elderlycare2.di
 
 import android.content.Context
+import com.example.elderlycare2.data.api.LoginAPi
 import com.example.elderlycare2.data.api.ScheduleApi
 import com.example.elderlycare2.data.api.SignupApi
 import com.example.elderlycare2.data.api.TasksApi
 import com.example.elderlycare2.data.api.UserProfileApi
+import com.example.elderlycare2.data.repository.LoginRepository
 import com.example.elderlycare2.data.repository.ScheduleRepository
 import com.example.elderlycare2.data.repository.SignupRepository
 import com.example.elderlycare2.data.repository.TaskRepository
@@ -62,6 +64,12 @@ object AppModule {
     @Singleton
     fun provideSignupRepository(signupApi: SignupApi): SignupRepository {
         return SignupRepository(signupApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLoginRepository(loginApi: LoginAPi, localStorage: LocalStorage): LoginRepository {
+        return LoginRepository(loginApi, localStorage)
     }
 
     @Provides

@@ -6,6 +6,7 @@ package com.example.elderlycare2.di
 //import com.example.medical_schedule_app.data.api.DoctorApiService
 //import com.example.medical_schedule_app.data.api.ReceptionistApiService
 import com.example.elderlycare2.data.api.ApiService
+import com.example.elderlycare2.data.api.LoginAPi
 import com.example.elderlycare2.data.api.NurseApi
 import com.example.elderlycare2.data.api.ScheduleApi
 import com.example.elderlycare2.data.api.SignupApi
@@ -106,6 +107,12 @@ object NetworkModule {
     @Singleton
     fun provideSignupApi(retrofit: Retrofit): SignupApi {
         return retrofit.create(SignupApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLoginApi(retrofit: Retrofit): LoginAPi {
+        return retrofit.create(LoginAPi::class.java)
     }
 
 //    @Provides

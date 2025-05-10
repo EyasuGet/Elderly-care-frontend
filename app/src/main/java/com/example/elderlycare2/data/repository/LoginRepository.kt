@@ -9,15 +9,10 @@ class LoginRepository(
     private val loginApi: LoginAPi,
     private val localStorage: LocalStorage
 ) {
-
-    suspend fun loginUser(email: String, password: String): LoginResponse {
-        val loginRequest = LoginRequest(email = email, password = password)
-        val response = loginApi.login(loginRequest)
-
-        // Save token and role for session management
+    suspend fun login(email: String, password: String): LoginResponse {
+        val response = loginApi.login(LoginRequest(email, password))
         response.token?.let { localStorage.saveToken(it) }
         response.role?.let { localStorage.saveRole(it) }
-
         return response
     }
 }
